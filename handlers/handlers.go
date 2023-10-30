@@ -198,5 +198,33 @@ func UpdateScore(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteRecord(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodDelete {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var input models.SATresults
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, "Error decoding request body", http.StatusBadRequest)
+		return
+	}
+
+	if len(input.Name) == 0 || len(input.Name) > 50 {
+		http.Error(w, "Invalid name", http.StatusBadRequest)
+		return
+	}
+
+	deleteRecordQuery := `DELETE FROM results WHERE name=$1`
+
+	_, err = db.DB.Exec(deleteRecordQuery, input.Name)
+	if err != nil {
+		http.Error(w, "Error deleting the record", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
 
 }
