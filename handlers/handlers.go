@@ -120,6 +120,30 @@ func ViewAllData(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetRank(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var input models.SATresults
+	var rank models.Rank
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, "Error decoding request body", http.StatusBadRequest)
+		return
+	}
+
+	rankQuery := `SELECT rank from (SELECT name,RANK() OVER ( ORDER BY sat_score DESC)rank FROM results) WHERE name=$1`
+
+	err = db.DB.QueryRow(rankQuery, input.Name).Scan(&rank.Rank)
+	if err != nil {
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(rank)
 
 }
 
