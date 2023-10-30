@@ -135,6 +135,11 @@ func GetRank(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(input.Name) == 0 || len(input.Name) > 50 {
+		http.Error(w, "Invalid name", http.StatusBadRequest)
+		return
+	}
+
 	rankQuery := `SELECT rank from (SELECT name,RANK() OVER ( ORDER BY sat_score DESC)rank FROM results) WHERE name=$1`
 
 	err = db.DB.QueryRow(rankQuery, input.Name).Scan(&rank.Rank)
@@ -144,10 +149,51 @@ func GetRank(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewEncoder(w).Encode(rank)
+	if err != nil {
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 
 }
 
 func UpdateScore(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPut {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var input models.SATresults
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, "Error decoding request body", http.StatusBadRequest)
+		return
+	}
+
+	if len(input.Name) == 0 || len(input.Name) > 50 {
+		http.Error(w, "Invalid name", http.StatusBadRequest)
+		return
+	}
+
+	if input.SATscore > 100.00 || input.SATscore < 0 {
+		http.Error(w, "Invalid SAT score", http.StatusBadRequest)
+		return
+	}
+
+	var passStatus bool
+	if input.SATscore > 30.00 {
+		passStatus = true
+	}
+
+	updateSATscoreQuery := `UPDATE results SET sat_score=$1,pass_status=$2 WHERE name=$3 RETURNING sat_score`
+	err = db.DB.QueryRow(updateSATscoreQuery, input.SATscore, passStatus, input.Name).Scan(&input.SATscore)
+	if err != nil {
+		http.Error(w, "Error updating SAT score", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(200)
 
 }
 
