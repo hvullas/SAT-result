@@ -125,6 +125,7 @@ func ViewAllData(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetRank handle for responding with the rank obtained by the candidate
+// rank may change dynamically if the score in the table is updated with new values
 func GetRank(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -165,7 +166,8 @@ func GetRank(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// handle function to update the SAT score of the candidate
+// handle function to update the SAT score of the candidate using name of the candidate
+// also updates the pass_status column according to the new value
 func UpdateScore(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
@@ -208,7 +210,7 @@ func UpdateScore(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// For deleting the record i the database table with the given name of the candidate
+// For deleting the record in the database table with the given name of the candidate
 func DeleteRecord(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
