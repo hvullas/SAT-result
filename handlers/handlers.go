@@ -47,7 +47,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
 
 	//len(input.Name)==0 ensure that the field is not empty
 	//len(input.Name)>50 ensure that the name field does not contain unnecessary data
-	if len(input.Name) > 50 || len(input.Name) <= 0 {
+	if len(input.Name) > 50 || len(input.Name) == 0 {
 		http.Error(w, "Invalid name", http.StatusBadRequest)
 		return
 	}
@@ -56,21 +56,40 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
 	caser := cases.Title(language.English)
 	input.Name = caser.String(input.Name)
 
-	//validate input address
-	if len(input.Address) > 100 || len(input.Address) <= 0 {
+	//Keeping length of the address less than 100 character
+	//len(input.Address)==0 ensure that the field is not empty
+	if len(input.Address) > 100 || len(input.Address) == 0 {
 		http.Error(w, "Invalid address", http.StatusBadRequest)
 		return
 	}
 
 	//validate input city name
-	if len(input.City) > 50 || len(input.City) <= 0 {
+	if len(input.City) > 50 || len(input.City) == 0 {
+		http.Error(w, "Invalid city name", http.StatusBadRequest)
+		return
+	}
+
+	//validates for characters in the name of the city are only alphabets and can have only space
+	validCityPattern := regexp.MustCompile("^[A-Za-z\\s]+$")
+
+	if !validCityPattern.MatchString(input.City) {
+		// Name is invalid
 		http.Error(w, "Invalid city name", http.StatusBadRequest)
 		return
 	}
 
 	//validate input country name
-	if len(input.Country) > 50 || len(input.Country) <= 0 {
+	if len(input.Country) > 50 || len(input.Country) == 0 {
 		http.Error(w, "Invalid country name", http.StatusBadRequest)
+		return
+	}
+
+	//validates for characters in the name of the country are only alphabets and can have only space
+	validCountryPattern := regexp.MustCompile("^[A-Za-z\\s]+$")
+
+	if !validCountryPattern.MatchString(input.Country) {
+		// Name is invalid
+		http.Error(w, "Invalid Country name", http.StatusBadRequest)
 		return
 	}
 
@@ -197,6 +216,15 @@ func GetRank(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//validates for characters in the name are only alphabets and can have only space
+	validNamePattern := regexp.MustCompile("^[A-Za-z\\s]+$")
+
+	if !validNamePattern.MatchString(input.Name) {
+		// Name is invalid
+		http.Error(w, "Invalid name", http.StatusBadRequest)
+		return
+	}
+
 	//len(input.Name)==0 ensure that the field is not empty
 	//len(input.Name)>50 ensure that the name field does not contain unnecessary data
 	if len(input.Name) == 0 || len(input.Name) > 50 {
@@ -244,6 +272,15 @@ func UpdateScore(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Error decoding request body", http.StatusBadRequest)
+		return
+	}
+
+	//validates for characters in the name are only alphabets and can have only space
+	validNamePattern := regexp.MustCompile("^[A-Za-z\\s]+$")
+
+	if !validNamePattern.MatchString(input.Name) {
+		// Name is invalid
+		http.Error(w, "Invalid name", http.StatusBadRequest)
 		return
 	}
 
@@ -302,6 +339,15 @@ func DeleteRecord(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Error decoding request body", http.StatusBadRequest)
+		return
+	}
+
+	//validates for characters in the name are only alphabets and can have only space
+	validNamePattern := regexp.MustCompile("^[A-Za-z\\s]+$")
+
+	if !validNamePattern.MatchString(input.Name) {
+		// Name is invalid
+		http.Error(w, "Invalid name", http.StatusBadRequest)
 		return
 	}
 
