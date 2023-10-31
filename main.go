@@ -1,10 +1,10 @@
 package main
 
 import (
-	"backend/db"       //package for database operations
-	"backend/handlers" //package for request handlers
-	"log"              //Imported for logging
-	"net/http"         //package for creating an http server
+	"backend/api" //package with registered routes
+	"backend/db"  //package for database operations
+	"log"         //Imported for logging
+	"net/http"    //package for creating an http server
 )
 
 func main() {
@@ -14,18 +14,10 @@ func main() {
 	defer db.DB.Close()
 
 	//create database schema
-	db.CreateSchema()
+	db.CreateDatabaseSchema()
 
-	//associating routes with their handle functions(defined in /handlers)
-	http.HandleFunc("/insert-data", handlers.InsertData)
-
-	http.HandleFunc("/view-all-data", handlers.ViewAllData)
-
-	http.HandleFunc("/get-rank", handlers.GetRank)
-
-	http.HandleFunc("/update-score", handlers.UpdateScore)
-
-	http.HandleFunc("/delete-record", handlers.DeleteRecord)
+	//for accessing registered routes
+	api.RegisteredRoutes()
 
 	//Start an HTTP server on port 3000
 	log.Fatal(http.ListenAndServe(":3000", nil))

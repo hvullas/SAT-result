@@ -1,4 +1,4 @@
-package handlers
+package api
 
 import (
 	"backend/db"

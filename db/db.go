@@ -40,7 +40,7 @@ func ConnectDB() {
 	log.Println("Connected to database")
 }
 
-func CreateSchema() {
+func CreateDatabaseSchema() {
 	//SQL query that creates table 'results' if it doest not exist in the database
 	createResultsTable := ` CREATE TABLE IF NOT EXISTS results(
 		name VARCHAR(50) PRIMARY KEY,
