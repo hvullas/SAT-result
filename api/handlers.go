@@ -12,16 +12,18 @@ import (
 	"golang.org/x/text/language"
 )
 
-var (
-	ErrInvalidName      = "Invalid name"
-	ErrInvalidAddress   = "Invalid address"
-	ErrInvalidCity      = "Invalid city name"
-	ErrInvalidCountry   = "Invalid country name"
-	ErrInvalidPincode   = "Invalid postal code"
-	ErrInvalidSATScore  = "Invalid SAT score"
-	ErrDatabaseError    = "Internal server error"
-	ErrMethodNotAllowed = "Method not allowed"
-	ErrJSONdecoding     = "Error decoding JSON request body"
+// custom errors
+const (
+	ErrInvalidName         = "Invalid name"
+	ErrInvalidAddress      = "Invalid address"
+	ErrInvalidCity         = "Invalid city name"
+	ErrInvalidCountry      = "Invalid country name"
+	ErrInvalidPincode      = "Invalid postal code"
+	ErrInvalidSATScore     = "Invalid SAT score"
+	ErrDatabaseError       = "Internal server error"
+	ErrMethodNotAllowed    = "Method not allowed"
+	ErrDecodingRequestBody = "Error decoding JSON request body"
+	ErrEncodingResponse    = "Error encoding response"
 )
 
 // InsertData is for handling reading input data from request and inserting it into the database
@@ -38,7 +40,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
 	//decodes the request body into input variable
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, ErrJSONdecoding, http.StatusBadRequest)
+		http.Error(w, ErrDecodingRequestBody, http.StatusBadRequest)
 		return
 	}
 
@@ -70,6 +72,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//candidate passes if score is more than 30%
 	var passStatus bool
 	if input.SATscore > 30.00 {
 		passStatus = true
@@ -87,6 +90,7 @@ func InsertData(w http.ResponseWriter, r *http.Request) {
 }
 
 // viewAllData handle is for fetching all the data present in the results table in the database
+// response is an array of records of candidates
 func ViewAllData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -114,7 +118,7 @@ func ViewAllData(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(resultData)
 	if err != nil {
-		http.Error(w, ErrJSONdecoding, http.StatusInternalServerError)
+		http.Error(w, ErrEncodingResponse, http.StatusInternalServerError)
 		return
 	}
 
@@ -133,7 +137,7 @@ func GetRank(w http.ResponseWriter, r *http.Request) {
 	var rank models.Rank
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, ErrJSONdecoding, http.StatusBadRequest)
+		http.Error(w, ErrDecodingRequestBody, http.StatusBadRequest)
 		return
 	}
 
@@ -155,7 +159,7 @@ func GetRank(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewEncoder(w).Encode(rank)
 	if err != nil {
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		http.Error(w, ErrEncodingResponse, http.StatusInternalServerError)
 		return
 	}
 
@@ -173,7 +177,7 @@ func UpdateScore(w http.ResponseWriter, r *http.Request) {
 	var input models.SATresults
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, ErrJSONdecoding, http.StatusBadRequest)
+		http.Error(w, ErrDecodingRequestBody, http.StatusBadRequest)
 		return
 	}
 
@@ -215,7 +219,7 @@ func DeleteRecord(w http.ResponseWriter, r *http.Request) {
 	var input models.SATresults
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		http.Error(w, ErrJSONdecoding, http.StatusBadRequest)
+		http.Error(w, ErrDecodingRequestBody, http.StatusBadRequest)
 		return
 	}
 

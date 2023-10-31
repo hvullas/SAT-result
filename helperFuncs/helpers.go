@@ -11,6 +11,7 @@ func MatchPattern(structfield string) bool {
 	return validNamePattern.MatchString(structfield)
 }
 
+// names of candidate,country name, city name is considered to be less than 50 characters and contains only alphabet and space
 func ValidName(name string) bool {
 	return len(name) != 0 && len(name) < 50 && MatchPattern(name)
 }
@@ -23,10 +24,12 @@ func ValidCityName(city string) bool {
 	return len(city) < 50 && len(city) != 0 && MatchPattern(city)
 }
 
+// considered to have less than 100 characters
 func ValidAddress(address string) bool {
 	return len(address) < 100 && len(address) != 0
 }
 
+// pincode is considered to have only 6 digits number
 func ValidPincode(pincode string) bool {
 	if len(pincode) != 6 {
 		return false
@@ -37,6 +40,7 @@ func ValidPincode(pincode string) bool {
 	return match
 }
 
+// SAT score is read from input as percentage from 0.00 to 100.00
 func ValidSATscore(score float64) bool {
 	return score <= 100.00 || score >= 0.00
 }
