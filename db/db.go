@@ -37,5 +37,24 @@ func ConnectDB() {
 	}
 
 	//logs a successful database connection
-	log.Print("Connected to database")
+	log.Println("Connected to database")
+}
+
+func CreateSchema() {
+	//SQL query that creates table 'results' if it doest not exist in the database
+	createResultsTable := ` CREATE TABLE IF NOT EXISTS results(
+		name VARCHAR(50) PRIMARY KEY,
+		address VARCHAR(100) NOT NULL,
+		city VARCHAR(50) NOT NULL,
+		country VARCHAR(50) NOT NULL,
+		pincode VARCHAR(10) NOT NULL,
+		sat_score NUMERIC(5,2) NOT NULL,
+		pass_status BOOLEAN
+	)`
+
+	_, err := DB.Exec(createResultsTable)
+	if err != nil {
+		log.Panicln("Error creating table in the database")
+		return
+	}
 }

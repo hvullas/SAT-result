@@ -13,22 +13,8 @@ func main() {
 	db.ConnectDB()
 	defer db.DB.Close()
 
-	//SQL query that creates table 'results' if it doest not exist in the database
-	createResultsTable := ` CREATE TABLE IF NOT EXISTS results(
-		name VARCHAR(50) PRIMARY KEY,
-		address VARCHAR(100) NOT NULL,
-		city VARCHAR(50) NOT NULL,
-		country VARCHAR(50) NOT NULL,
-		pincode VARCHAR(10) NOT NULL,
-		sat_score NUMERIC(5,2) NOT NULL,
-		pass_status BOOLEAN
-	)`
-
-	_, err := db.DB.Exec(createResultsTable)
-	if err != nil {
-		log.Panicln("Error creating table in the database")
-		return
-	}
+	//create database schema
+	db.CreateSchema()
 
 	//associating routes with their handle functions(defined in /handlers)
 	http.HandleFunc("/insert-data", handlers.InsertData)
